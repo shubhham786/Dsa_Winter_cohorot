@@ -786,6 +786,47 @@ public class leetcoderQuestion {
 
         return maxScore;
     }
+
+    //1750. Minimum Length of String After Deleting Similar Ends
+    public int minimumLength(String s) {
+        int i = 0;
+        int j = s.length() - 1;
+
+        while (i < j && s.charAt(i) == s.charAt(j)) {
+            char ch = s.charAt(i);
+
+            while (i <= j && s.charAt(i) == ch) {
+                i++;
+            }
+            while (i <= j && s.charAt(j) == ch) {
+                j--;
+            }
+        }
+
+        return (j < i) ? 0 : j - i + 1;
+    }
+
+    //42. Trapping Rain Water
+    public int trap(int[] height) {
+
+
+        int water=0;
+
+        int si=0;
+        int ei=height.length-1;
+        int lmax=0;
+        int rmax=0;
+        while(si<ei)
+        {
+            lmax=Math.max(lmax,height[si]);
+            rmax=Math.max(rmax,height[ei]);
+
+            water+= lmax>rmax?rmax-height[ei--]:lmax-height[si++];
+
+        }
+
+        return water;
+    }
     public static void main(String[] args) {
      String s="ab#c";
      String s1="ad#c";
