@@ -853,3 +853,9 @@ public class leetcoderQuestion {
        // System.out.println(minimumDifference(nums,6));
     }
 }
+
+
+/*
+com.assignment.question.LoggerTest.testSetLogFile  Time elapsed: 0.016 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: Setting log file path should be reflected in getLogFile() ==> expected: </tmp/junit6416996473651967313/test7108781242614047375.log> but was: </tmp/junit2493522762416459349/test14901256099438062278.log>
+ */
