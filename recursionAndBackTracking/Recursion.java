@@ -1,5 +1,6 @@
 package recursionAndBackTracking;
 
+import java.sql.SQLOutput;
 import java.util.*;
 
 public class Recursion {
@@ -111,12 +112,230 @@ public class Recursion {
         return ans1;
     }
 */
+
+    //permutation of string
+      public  static int permutation(String str, String ans)
+      {
+
+          if(str.length()==0)
+          {
+              System.out.println(ans);
+              return 1;
+          }
+
+          int count=0;
+
+           for(int i=0;i<str.length();i++)
+           {
+
+               char ch=str.charAt(i);
+
+               String ros=str.substring(0,i)+str.substring(i+1);
+
+               count+=permutation(ros,ans+ch);
+           }
+
+           return count;
+      }
+
+
+      // top down
+
+     //Uses less memory as results are added directly to a shared list.
+
+    public  static int permutation(String str, String ans, ArrayList<String>finalAns)
+    {
+
+        if(str.length()==0)
+        {
+            finalAns.add(ans);
+            return 1;
+        }
+
+        int count=0;
+
+        for(int i=0;i<str.length();i++)
+        {
+
+            char ch=str.charAt(i);
+
+            String ros=str.substring(0,i)+str.substring(i+1);
+
+            count+=permutation(ros,ans+ch, finalAns);
+        }
+
+        return count;
+    }
+
+
+    // bootom up
+
+
+
+    public  static ArrayList<String> permutation(String str)
+    {
+
+        if(str.length()==0)
+        {
+
+             ArrayList<String> ans=new ArrayList<>();
+             ans.add("");
+             return ans;
+
+
+        }
+
+
+
+         ArrayList<String>finalAns=new ArrayList<>();
+
+        for(int i=0;i<str.length();i++)
+        {
+            char ch=str.charAt(i);
+
+            String ros=str.substring(0,i)+str.substring(i+1);
+            ArrayList<String> ans=permutation(ros);
+
+            for(String s:ans)
+            {
+                finalAns.add(ch+s);
+            }
+        }
+
+
+        return finalAns;
+
+
+
+    }
+
+
+    //if {1,2,3} is given then
+    // ArrayList is given then
+
+    public static int permutaion(ArrayList<Integer>arr,int totalElement,int n,ArrayList<Integer>ans,ArrayList<ArrayList<Integer>>finalAns,boolean[] vis)
+    {
+
+        if(totalElement==n)
+        {
+            finalAns.add(new ArrayList<>(ans));
+
+            return 1;
+        }
+
+
+        int count=0;
+         for(int i=0;i<n;i++)
+         {
+             if(vis[i]==false) {
+                 vis[i] = true;
+                 int ele = arr.get(i);
+                 ans.add(ele);
+                 count += permutaion(arr, totalElement + 1, n, ans, finalAns, vis);
+                 ans.remove(ans.size() - 1);
+                 vis[i] = false;
+
+             }
+         }
+
+         return count;
+    }
+
+
+    public static int permutation(
+            ArrayList<Integer> arr,
+            ArrayList<Integer> current,
+            ArrayList<ArrayList<Integer>> result)
+    {
+        if (arr.isEmpty()) {
+            result.add(new ArrayList<>(current));
+            return 1;
+        }
+
+        int count = 0;
+        for (int i = 0; i < arr.size(); i++) {
+            // Choose the element at index i
+            int chosen = arr.remove(i);
+            current.add(chosen);
+
+            // Recurse with the remaining elements
+            count += permutation(arr, current, result);
+
+            // Backtrack: restore the state
+            current.remove(current.size() - 1);
+            arr.add(i, chosen);
+        }
+
+        return count;
+    }
+
+    public static int permutaionUnique(int []arr,int totalElement,int n,List<Integer>ans,List<List<Integer>>finalAns,boolean[] vis)
+    {
+
+        if(totalElement==n)
+        {
+            finalAns.add(new ArrayList<>(ans));
+
+            return 1;
+        }
+
+
+        Set<Integer> set=new HashSet<>();
+        int count=0;
+        for(int i=0;i<n;i++)
+        {
+            if(vis[i]==false && !set.contains(arr[i])) {
+                set.add(arr[i]);
+                vis[i] = true;
+                int ele = arr[i];
+                ans.add(ele);
+                count += permutaionUnique(arr, totalElement + 1, n, ans, finalAns, vis);
+                ans.remove(ans.size() - 1);
+                vis[i] = false;
+
+            }
+        }
+
+        return count;
+    }
+
+    public static int permutaionUnique2(int []arr,int totalElement,int n,List<Integer>ans,List<List<Integer>>finalAns,boolean[] vis)
+    {
+
+        if(totalElement==n)
+        {
+            finalAns.add(new ArrayList<>(ans));
+
+            return 1;
+        }
+
+
+        int prev=-11;
+        int count=0;
+        for(int i=0;i<n;i++)
+        {
+            if(vis[i]==false && prev!=arr[i]) {
+
+                vis[i] = true;
+                int ele = arr[i];
+                ans.add(ele);
+                count += permutaionUnique2(arr, totalElement + 1, n, ans, finalAns, vis);
+                ans.remove(ans.size() - 1);
+                vis[i] = false;
+                prev=arr[i];
+
+
+            }
+
+
+        }
+
+        return count;
+    }
+
+
     public static void main(String[] args) {
 
-   int [] nums={1,2};
-
-      List<List<Integer>>ans=subsetsWithDup(nums);
-      System.out.println(ans);
 
     }
 }
