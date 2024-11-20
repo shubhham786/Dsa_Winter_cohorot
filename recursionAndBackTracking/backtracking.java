@@ -3,6 +3,7 @@ package recursionAndBackTracking;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class backtracking {
 
@@ -382,5 +383,54 @@ public class backtracking {
 
         return res;
 
+    }
+
+    //leetcode 131
+    public boolean isPalindrome(String input, int start, int end)
+    {
+
+        boolean isPalindrome = IntStream.range(0, (end - start + 1) / 2)
+                .noneMatch(i -> input.charAt(start + i) != input.charAt(end - i));
+
+        return isPalindrome;
+
+    }
+
+
+    public int partition(String input,int idx,List<String>currAns,List<List<String>>finalAns)
+    {
+        if(idx==input.length())
+        {
+            finalAns.add(new ArrayList<>(currAns));
+            return 1;
+        }
+
+
+        int count=0;
+
+        for(int i=idx;i<input.length();i++)
+        {
+
+            if(isPalindrome(input,idx,i)){
+
+                currAns.add(input.substring(idx,i+1));
+                count+=partition(input,i+1,currAns,finalAns);
+
+                currAns.remove(currAns.size()-1);
+
+            }
+        }
+
+        return count;
+    }
+
+
+    public List<List<String>> partition(String s) {
+        List<String> currAns = new ArrayList<>();
+        List<List<String>> finalAns = new ArrayList<>();
+
+        int count=partition(s,0,currAns,finalAns);
+
+        return finalAns;
     }
 }
