@@ -1,7 +1,9 @@
 package recursionAndBackTracking;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class practice {
 
@@ -10,6 +12,7 @@ public class practice {
     static int  len1=1;
 
     public static void maxLength(List<String> arr, int len, int idx, int[] mask) {
+
 
         if (idx == arr.size()) {
 

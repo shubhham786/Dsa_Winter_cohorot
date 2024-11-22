@@ -831,9 +831,315 @@ class Solution {
         if (sum % k != 0) {
             return false;
         }
-
+        Set<Integer> set = new HashSet<>();
         sum = sum / k;
         boolean[] vis = new boolean[nums.length];
         return partition(nums, k, 0, sum, 0, vis);
     }
+
+    //leetcode 2597
+    public int beautiful(int[] nums, int k, int idx, Map<Integer, Integer> map) {
+
+        // System.out.println(s+" "+map);
+        int count = 1;
+
+        for (int i = idx; i < nums.length; i++) {
+            int ele = nums[i];
+            if (!map.containsKey(ele - k) && !map.containsKey(ele + k)) {
+                map.put(ele, map.getOrDefault(ele, 0) + 1);
+                count += beautiful(nums, k, i + 1, map);
+                if (map.get(ele) == 1) {
+                    map.remove(ele);
+                } else {
+                    map.put(ele, map.get(ele) - 1);
+                }
+
+            }
+        }
+
+        return count;
+
+    }
+
+    /*
+    using exclude and include
+     public int beautiful(int[] nums, int k, int idx, Map<Integer, Integer> map) {
+
+        if (idx == nums.length)
+            return 1;
+
+        int count = 0;
+
+        int ele = nums[idx];
+
+        if (!map.containsKey(ele - k) && !map.containsKey(ele + k)) {
+            map.put(ele, map.getOrDefault(ele, 0) + 1);
+            count += beautiful(nums, k, idx + 1, map);
+            if (map.get(ele) == 1) {
+                map.remove(ele);
+            } else {
+                map.put(ele, map.get(ele) - 1);
+            }
+        }
+        count += beautiful(nums, k, idx + 1, map);
+
+        return count;
+
+    }
+     */
+    public int beautifulSubsets(int[] nums, int k) {
+
+         //using set will fail for [1,1,2,3]
+        Arrays.sort(nums);
+
+
+        Map<Integer, Integer> map = new HashMap<>();
+        return beautiful(nums, k, 0, map) - 1;
+    }
+
+    //leetcode 51
+    //Nqueen
+    public boolean isSafeToPlaceQueen(List<String> currAns, int row, int col) {
+        // same column me na ho kaui
+        for (int i = 0; i < row; i++) {
+            if (currAns.get(i).charAt(col) == 'Q') {
+                return false; // Same column
+            }
+
+            //see this one
+            if (Math.abs(i - row) == Math.abs(currAns.get(i).indexOf('Q') - col))
+                return false;
+        }
+
+        return true;
+
+    }
+
+    public int solve(int n, int row, List<String> currAns, List<List<String>> ans) {
+        if (row == n) {
+            ans.add(new ArrayList<>(currAns));
+            return 1;
+        }
+        int count = 0;
+
+        for (int i = 0; i < n; i++) {
+            if (isSafeToPlaceQueen(currAns, row, i)) {
+                String s = currAns.get(row); // Assuming currAns is a List<String>
+                // String original = s;
+                char[] charArray = s.toCharArray(); // Convert the string to a char array
+                charArray[i] = 'Q'; // Modify the character at index i
+
+                currAns.set(row, new String(charArray));
+
+                count += solve(n, row + 1, currAns, ans);
+                currAns.set(row, s);
+
+            }
+        }
+
+        return count;
+
+    }
+
+    public List<List<String>> solveNQueens(int n) {
+
+        List<String> currAns = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            StringBuilder sb = new StringBuilder();
+
+            for (int j = 0; j < n; j++) {
+                sb.append(".");
+            }
+
+            currAns.add(sb.toString());
+        }
+
+        List<List<String>> ans = new ArrayList<>();
+
+        int count = solve(n, 0, currAns, ans);
+
+        return ans;
+    }
+
+    //leetcode 1255
+    public int maxScoreWords(String[] words, int[] freq, int[] score, int idx) {
+        if (idx == words.length) {
+            return 0;
+        }
+
+        int exclude = maxScoreWords(words, freq, score, idx + 1);
+
+        int include = 0;
+
+        boolean isUsed = true;
+
+        String word = words[idx];
+        int sword = 0;
+        for (int i = 0; i < word.length(); i++) {
+            char ch = word.charAt(i);
+
+            if (freq[ch - 'a'] == 0)
+                isUsed = false;
+
+            freq[ch - 'a']--;
+            sword += score[ch - 'a'];
+        }
+
+        if (isUsed) {
+            include = sword + maxScoreWords(words, freq, score, idx + 1);
+        }
+
+        for (int i = 0; i < word.length(); i++) {
+            char ch = word.charAt(i);
+            freq[ch - 'a']++;
+
+        }
+
+        return Math.max(include, exclude);
+
+    }
+
+    /*
+    using for loop
+    public int maxScoreWords(String[] words, int[] freq, int[] score, int idx) {
+        if (idx == words.length) {
+            return 0;
+        }
+
+        int maxScore = 0;
+        for (int j = idx; j < words.length; j++) {
+
+            String word = words[j];
+            boolean isUsed = true;
+            int wordScore = 0;
+            for (int i = 0; i < word.length(); i++) {
+                char ch = word.charAt(i);
+
+                if (freq[ch - 'a'] == 0)
+                    isUsed = false;
+
+                freq[ch - 'a']--;
+                wordScore += score[ch - 'a'];
+            }
+
+            int currentScore = 0;
+            if (isUsed) {
+                currentScore = wordScore + maxScoreWords(words, freq, score, j + 1);
+            }
+
+            for (int i = 0; i < word.length(); i++) {
+                char ch = word.charAt(i);
+                freq[ch - 'a']++;
+
+            }
+
+            maxScore = Math.max(maxScore, currentScore);
+        }
+        return maxScore;
+
+    }
+     */
+    public int maxScoreWords(String[] words, char[] letters, int[] score) {
+
+        int[] freq = new int[26];
+
+        for (int i = 0; i < letters.length; i++) {
+            char ch = letters[i];
+
+            freq[ch - 'a']++;
+        }
+        return maxScoreWords(words, freq, score, 0);
+    }
+
+    //leetcode 140
+    public int wordBreak(String s,List<String>finalAns,int idx,Set<String>set,StringBuilder currAns)
+    {
+        if(idx==s.length())
+        {
+            finalAns.add(currAns.toString().trim());
+            return 1;
+        }
+
+        int count=0;
+
+        StringBuilder sb=new StringBuilder();
+        for(int i=idx;i<s.length();i++)
+        {
+            sb.append(s.charAt(i));
+
+            String s1=sb.toString();
+
+            if(set.contains(s1))
+            {
+                int prevLen=currAns.length();
+                currAns.append(s1).append(" ");
+                count+=wordBreak(s,finalAns,i+1,set,currAns);
+                currAns.setLength(prevLen);
+
+            }
+        }
+
+        return count;
+    }
+
+    public List<String> wordBreak(String s, List<String> wordDict) {
+
+
+        List<String>finalAns=new ArrayList<>();
+        Set<String>set=new HashSet<>();
+
+        for(String s1:wordDict)
+            set.add(s1);
+
+
+        wordBreak(s,finalAns,0,set,new StringBuilder());
+
+        return finalAns;
+    }
+    /*
+    using string
+        public int wordBreak(String s,List<String>finalAns,int idx,Set<String>set,String currAns)
+    {
+          if(idx==s.length())
+          {
+              finalAns.add(currAns.trim());
+              return 1;
+          }
+
+          int count=0;
+
+          StringBuilder sb=new StringBuilder();
+          for(int i=idx;i<s.length();i++)
+          {
+              sb.append(s.charAt(i));
+
+              String s1=sb.toString();
+
+              if(set.contains(s1))
+              {
+
+                  count+=wordBreak(s,finalAns,i+1,set,currAns+s1+" ");
+
+              }
+          }
+
+          return count;
+    }
+
+    public List<String> wordBreak(String s, List<String> wordDict) {
+
+
+        List<String>finalAns=new ArrayList<>();
+        Set<String>set=new HashSet<>();
+
+        for(String s1:wordDict)
+         set.add(s1);
+
+
+         wordBreak(s,finalAns,0,set,"");
+
+         return finalAns;
+    }
+     */
 }
