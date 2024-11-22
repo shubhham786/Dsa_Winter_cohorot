@@ -1,8 +1,6 @@
 package recursionAndBackTracking;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.IntStream;
 
 public class backtracking {
@@ -430,7 +428,412 @@ public class backtracking {
         List<List<String>> finalAns = new ArrayList<>();
 
         int count=partition(s,0,currAns,finalAns);
+        return finalAns;
+    }
+
+    //leetcode 93
+    public int ipAddress(String s, int idx, String currAns, List<String> finalAns, int dots) {
+
+        if (s.length() == idx || dots == 4) {
+
+            if (s.length() == idx && dots == 4) {
+                // removing last dot
+                finalAns.add(currAns.substring(0, currAns.length() - 1));
+
+                return 1;
+            }
+
+            return 0;
+        }
+
+        int count = 0;
+
+        for (int len = 1; len <= 3; len++) {
+            if (idx + len <= s.length()) {
+
+                String part = s.substring(idx, idx + len);
+
+                if (isValid(part))
+                    count += ipAddress(s, idx + len, currAns + part + ".", finalAns, dots + 1);
+            }
+
+        }
+
+        return count;
+    }
+
+    public boolean isValid(String s) {
+        if (s.length() > 1 && s.charAt(0) == '0')
+            return false;
+
+        int num = Integer.parseInt(s);
+
+        return num >= 0 && num <= 255;
+    }
+
+    //using StringBuilder
+    public int  ipAddresses(String s, int idx, StringBuilder currAns, List<String> finalAns, int dots) {
+        // Base case: if we've reached the end of the string or formed 4 segments
+        if (idx == s.length() || dots == 4) {
+            if (idx == s.length() && dots == 4) {
+                // Remove the last dot and add to the final result
+                finalAns.add(currAns.substring(0, currAns.length() - 1));
+                return 1;
+            }
+            return 0;
+        }
+
+        int count=0;
+
+        for (int len = 1; len <= 3; len++) {
+            if (idx + len > s.length()) break; // Substring out of bounds
+
+            String part = s.substring(idx, idx + len);
+
+            // Check if the segment is valid
+            if (isValid(part)) {
+                int prevLength = currAns.length(); // Store current length
+
+                // Add the current segment and a dot
+                currAns.append(part).append('.');
+
+                // Recursive call
+                count+=ipAddresses(s, idx + len, currAns, finalAns, dots + 1);
+
+                // Backtrack: remove the added segment and dot
+                currAns.setLength(prevLength);
+            }
+        }
+
+        return count;
+    }
+    public List<String> restoreIpAddresses(String s) {
+
+        List<String> finalAns = new ArrayList<>();
+
+        //using string
+       // int count = ipAddress(s, 0, "", finalAns, 0);
+        //using StringBuilder
+        int count =  ipAddresses(s, 0,  new StringBuilder(), finalAns, 0);
 
         return finalAns;
+
+    }
+
+    //leetcode 17
+    public int combination(String digits, int idx, StringBuilder currAns, List<String> finalAns, String[] map) {
+
+        if (idx == digits.length()) {
+            finalAns.add(currAns.toString());
+            return 1;
+        }
+
+        int count = 0;
+        int index = digits.charAt(idx) - '0';
+        String currIndexString = map[index];
+
+        for (int i = 0; i < currIndexString.length(); i++) {
+            char ch = currIndexString.charAt(i);
+            int prevLength=currAns.length();
+            currAns.append(ch);
+            count += combination(digits, idx + 1, currAns, finalAns, map);
+            currAns.setLength(prevLength);
+
+        }
+
+        return count;
+    }
+
+    public List<String> letterCombinations(String digits) {
+
+        List<String> finalAns = new ArrayList<>();
+        if (digits.length() == 0)
+            return finalAns;
+
+        String[] map = { "", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz" };
+        int count = combination(digits, 0, new StringBuilder(), finalAns, map);
+
+        return finalAns;
+
+    }
+
+    /*
+    using string
+        public int combination(String digits, int idx, String currAns, List<String> finalAns, String[] map) {
+
+        if (idx == digits.length()) {
+            finalAns.add(currAns);
+            return 1;
+        }
+
+        int count = 0;
+        int index = digits.charAt(idx) - '0';
+        String currIndexString = map[index];
+
+        for (int i = 0; i < currIndexString.length(); i++) {
+            char ch = currIndexString.charAt(i);
+            count += combination(digits, idx + 1, currAns + ch, finalAns, map);
+
+        }
+
+        return count;
+    }
+
+    public List<String> letterCombinations(String digits) {
+
+        List<String> finalAns = new ArrayList<>();
+        if (digits.length() == 0)
+            return finalAns;
+
+        String[] map = { "", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz" };
+        int count = combination(digits, 0, "", finalAns, map);
+
+        return finalAns;
+
+    }
+     */
+
+
+//leetcode 473
+    //revisit during graph and dp
+    public boolean makeSquare(int[] matchsticks, int idx, long[] len, long len1) {
+
+        if (idx == matchsticks.length) {
+            boolean res = true;
+            for (int i = 0; i < 4; i++) {
+                if (len[i] != len1)
+                    res = false;
+            }
+
+            return res;
+
+        }
+
+
+        boolean res = false;
+
+        for (int i = 0; i < 4; i++) {
+            if (len[i] + matchsticks[idx] > len1) {
+                continue;
+            }
+            len[i] += matchsticks[idx];
+            res = res || makeSquare(matchsticks, idx + 1, len, len1);
+            len[i] -= matchsticks[idx];
+
+            // If the desired sum has already been achieved for this side (len[i] == 0 after
+            // backtracking),
+            // move forward in the loop to avoid checking equivalent empty sides.
+            if (len[i] == 0) {
+                break;
+            }
+
+        }
+
+        return res;
+    }
+
+    public boolean makesquare(int[] matchsticks) {
+
+        long[] len = new long[4];
+
+        long sum = 0;
+
+        for (int i = 0; i < matchsticks.length; i++)
+            sum += matchsticks[i];
+
+        if (sum % 4 != 0)
+            return false;
+
+        long len1 = sum / 4;
+
+        return makeSquare(matchsticks, 0, len, len1);
+    }
+
+//leetcode 1849
+    /*
+    import java.math.BigInteger;
+
+class Solution {
+
+    public boolean isValid(String currStr, String prev) {
+
+        BigInteger num = new BigInteger(currStr); // Parse to BigInteger
+        BigInteger num1 = new BigInteger(prev);
+
+        return num1.subtract(num).equals(BigInteger.ONE);
+
+    }
+
+    public boolean splitString(String s, int idx, String prev, int noSplit) {
+
+        if (idx == s.length()) {
+
+            // System.out.println("prev "+prev);
+            if (prev.length() == idx)
+                return false;
+
+            return noSplit >= 1;
+        }
+
+        boolean res = false;
+        for (int i = idx; i < s.length(); i++) {
+            String currStr = s.substring(idx, i + 1);
+
+            if (prev.equals("") || isValid(currStr, prev))
+                res = res || splitString(s, i + 1, currStr, noSplit + 1);
+
+        }
+
+        return res;
+
+    }
+
+    public boolean splitString(String s) {
+
+        return splitString(s, 0, "", 0);
+    }
+}
+     */
+
+    public boolean splitString(String s, int idx, ArrayList<Long> list) {
+
+        if (idx == s.length()) {
+
+            return list.size() >= 2;
+        }
+
+        boolean res = false;
+        long num = 0;
+        for (int i = idx; i < s.length(); i++) {
+
+            num = num * 10 + (s.charAt(i) - '0');
+
+            if (list.size() == 0 || list.get(list.size() - 1) - num == 1) {
+                list.add(num);
+                res = res || splitString(s, i + 1, list);
+
+                list.remove(list.size() - 1);
+            }
+
+        }
+
+        return res;
+
+    }
+
+    public boolean splitString(String s) {
+
+        return splitString(s, 0, new ArrayList<Long>());
+    }
+
+    //1980. Find Unique Binary String
+    private String generate(String curr, int n, Set<String> numsSet) {
+        if (curr.length() == n) {
+            if (!numsSet.contains(curr)) {
+                return curr;
+            }
+
+            return "";
+        }
+
+        String addZero = generate(curr + "0", n, numsSet);
+        if (addZero.length() > 0) {
+            return addZero;
+        }
+
+        return generate(curr + "1", n, numsSet);
+    }
+
+    public String findDifferentBinaryString(String[] nums) {
+        int n = nums.length;
+        Set<String> numsSet = new HashSet();
+        for (String s : nums) {
+            numsSet.add(s);
+        }
+
+        return generate("", n, numsSet);
+    }
+
+    //leetcode 1239
+    public int maxLength(List<String> arr) {
+        return backtrack(arr, 0, new HashSet<>());
+    }
+
+    // Helper function for backtracking
+    private int backtrack(List<String> arr, int idx, Set<Character> used) {
+        int maxLen = used.size(); // Current length is the size of the set
+
+        for (int i = idx; i < arr.size(); i++) {
+            String s = arr.get(i);
+            if (canAdd(s, used)) {
+                // Temporarily add this string's characters to the set
+                for (char ch : s.toCharArray()) {
+                    used.add(ch);
+                }
+
+                // Recur with the updated set
+                maxLen = Math.max(maxLen, backtrack(arr, i + 1, used));
+
+                // Backtrack: remove the string's characters
+                for (char ch : s.toCharArray()) {
+                    used.remove(ch);
+                }
+            }
+        }
+
+        return maxLen;
+    }
+
+    // Check if the string can be added without conflicts
+    private boolean canAdd(String s, Set<Character> used) {
+        Set<Character> temp = new HashSet<>();
+        for (char ch : s.toCharArray()) {
+            if (used.contains(ch) || !temp.add(ch)) {
+                return false; // Conflict found
+            }
+        }
+        return true;
+    }
+
+    //leetcode 698
+    public boolean partition(int[] nums, int k, int idx, int sum, int csum, boolean[] vis) {
+
+        if (k == 0)
+            return true;
+
+        boolean res = false;
+        if (csum == sum)
+            res = res || partition(nums, k - 1, 0, sum, 0, vis);
+
+        for (int i = idx; i < nums.length; i++) {
+
+            if (csum + nums[i] <= sum && vis[i] == false) {
+                vis[i] = true;
+
+                res = res || partition(nums, k, i + 1, sum, csum + nums[i], vis);
+                vis[i] = false;
+
+            }
+        }
+
+        return res;
+
+    }
+
+    public boolean canPartitionKSubsets(int[] nums, int k) {
+
+        int sum = 0;
+
+        for (int i = 0; i < nums.length; i++) {
+            sum += nums[i];
+        }
+
+        if (sum % k != 0) {
+            return false;
+        }
+
+        sum = sum / k;
+        boolean[] vis = new boolean[nums.length];
+        return partition(nums, k, 0, sum, 0, vis);
     }
 }
