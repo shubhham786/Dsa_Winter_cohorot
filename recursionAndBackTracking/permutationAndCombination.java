@@ -14,6 +14,15 @@ import java.util.ArrayList;
  */
 public class permutationAndCombination {
 
+    /**
+     * Calculates the number of permutations where infinite supply of given coins
+     * can sum up to a specified target value.
+     *
+     * @param arr The list of coin denominations available.
+     * @param ans The current permutation of coin values.
+     * @param target The remaining target value to be achieved.
+     * @return The count of different permutations that sum up to the target.
+     */
     public static int permutationInfiniteCoin(ArrayList<Integer> arr,String ans, int target) {
 
 
