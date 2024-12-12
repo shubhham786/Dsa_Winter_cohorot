@@ -1,7 +1,9 @@
 package dp;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class question {
 
@@ -716,6 +718,196 @@ public class question {
 
         // Return the result, modulo applied only for non-negative results
         return dpMax[0][0] >= 0 ? (int) (dpMax[0][0] % mod) : -1;
+    }
+
+    //https://www.naukri.com/code360/problems/partition-a-set-into-two-subsets-such-that-the-difference-of-subset-sums-is-minimum_842494?source=youtube&campaign=striver_dp_videos&utm_source=youtube&utm_medium=affiliate&utm_campaign=striver_dp_videos&leftPanelTab=0&leftPanelTabValue=PROBLEM
+    public static int minimumDifference1(int[] nums) {
+        int totSum = 0;
+
+        // Calculate total sum of the array
+        for (int num : nums) {
+            totSum += num;
+        }
+
+        int n = nums.length;
+        int tar = totSum / 2; // Target sum for one subset (to minimize difference)
+
+        // DP table: dp[i][j] -> Can we form sum j using the first i elements
+        boolean[][] dp = new boolean[n + 1][tar + 1];
+
+        // Base case: sum 0 is always possible
+        for (int i = 0; i <= n; i++) {
+            dp[i][0] = true;
+        }
+
+        // Fill the DP table
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= tar; j++) {
+                boolean res = false; // Initialize result for this cell
+
+                // Exclude nums[i - 1]
+                res = res || dp[i - 1][j];
+
+                // Include nums[i - 1] if it's possible to include
+                if (j >= nums[i - 1]) {
+                    res = res || dp[i - 1][j - nums[i - 1]];
+                }
+
+                dp[i][j] = res; // Update DP table
+            }
+        }
+
+        // Find the closest sum to tar
+        int closestSum = 0;
+        for (int j = tar; j >= 0; j--) {
+            if (dp[n][j]) {
+                closestSum = j;
+                break;
+            }
+        }
+
+        // Calculate the minimum difference
+        return Math.abs(totSum - 2 * closestSum);
+    }
+    public static int minSubsetSumDifference(int []arr, int n) {
+        // Write your code here.
+        return minimumDifference1(arr);
+    }
+
+    //leetcode 2035
+    //if negative element but recursive solution only
+    int ans = Integer.MAX_VALUE;
+
+    public int minimumDifference(int[] nums) {
+        int sum = 0;
+        for (int num : nums) {
+            sum += num;
+        }
+        call(nums, 0, 0, sum, 0);
+        return ans;
+    }
+
+    public void call(int[] nums, int sum, int i, int totalSum, int count) {
+        int n = nums.length / 2;
+
+        if (count == n) {
+            int x = Math.abs(totalSum - (2 * sum));
+            ans = Math.min(ans, x);
+            return;
+        }
+        if (i >= nums.length) {
+            return;
+        }
+
+        call(nums, sum + nums[i], i + 1, totalSum, count + 1);
+        call(nums, sum, i + 1, totalSum, count);
+
+    }
+
+    //https://www.geeksforgeeks.org/problems/perfect-sum-problem5633/1?utm_source=youtube&utm_medium=collab_striver_ytdescription&utm_campaign=perfect-sum-problem
+    public int targetSum(int[] nums, int tar, int idx, int[][] dp) {
+        // Check bounds first
+        if (idx == nums.length) {
+            return (tar == 0) ? 1 : 0;  // Valid combination found only if target is also 0
+        }
+
+
+        if (dp[idx][tar] != -1) {
+            return dp[idx][tar];
+        }
+
+        int res = 0;
+        // Include current number
+        if (tar - nums[idx] >= 0) {
+            res += targetSum(nums, tar - nums[idx], idx + 1, dp);
+        }
+        // Exclude current number
+        res += targetSum(nums, tar, idx + 1, dp);
+
+        return dp[idx][tar] = res;
+    }
+
+    public int perfectSum(int[] nums, int tar) {
+        int n = nums.length;
+        int[][] dp = new int[n + 1][tar + 1];
+        for (int i = 0; i <= n; i++) {
+            Arrays.fill(dp[i], -1);
+        }
+
+        return targetSum(nums, tar, 0, dp);
+    }
+
+    //https://www.geeksforgeeks.org/problems/partitions-with-given-difference/1?utm_source=youtube&utm_medium=collab_striver_ytdescription&utm_campaign=partitions-with-given-difference
+    int countWaysTar(int[] arr,int idx,int tar,int[][] dp)
+    {
+
+        if(idx==arr.length)
+            return tar==0?1:0;
+
+        if(dp[idx][tar]!=-1)
+            return dp[idx][tar];
+
+        int count=0;
+
+        count+=countWaysTar(arr,idx+1,tar,dp);
+
+        if(tar>=arr[idx])
+            count+=countWaysTar(arr,idx+1,tar-arr[idx],dp);
+
+
+        return dp[idx][tar]=count;
+    }
+    int countPartitions(int[] arr, int d) {
+        // code here
+
+        int sum=0;
+        int n=arr.length;
+        for(int i=0;i<n;i++)
+        {
+            sum+=arr[i];
+        }
+
+
+        if((sum+d)%2!=0)
+            return 0;
+
+        int tar=(sum+d)/2;
+
+        int[][] dp=new int[n+1][tar+1];
+
+        for(int i=0;i<=n;i++)
+        {
+            Arrays.fill(dp[i],-1);
+        }
+        return countWaysTar(arr,0,tar,dp);
+
+    }
+
+    //494. Target Sum
+    public int find(int[] nums, int target, int idx, Map<String, Integer> memo) {
+        if (idx == nums.length) {
+            return target == 0 ? 1 : 0;
+        }
+
+        String key = idx + "," + target;
+        if (memo.containsKey(key)) {
+            return memo.get(key);
+        }
+
+        int count = 0;
+
+        // -ve
+        count += find(nums, target + nums[idx], idx + 1, memo);
+
+        // +ve
+        count += find(nums, target - nums[idx], idx + 1, memo);
+
+        memo.put(key, count);
+        return count;
+    }
+
+    public int findTargetSumWays(int[] nums, int target) {
+        return find(nums, target, 0, new HashMap<>());
     }
 }
 
