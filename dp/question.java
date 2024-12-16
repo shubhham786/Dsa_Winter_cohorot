@@ -1,9 +1,6 @@
 package dp;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class question {
 
@@ -908,6 +905,601 @@ public class question {
 
     public int findTargetSumWays(int[] nums, int target) {
         return find(nums, target, 0, new HashMap<>());
+    }
+
+    //leetcode 322. Coin Change
+    // using include exulde
+
+    public int coinChange(int[] coins, int amount, int idx, int[][] dp) {
+
+        if (amount == 0)
+            return 0;
+
+        if (idx == coins.length) {
+            return amount == 0 ? 0 : (int) 1e9;
+        }
+
+        if (dp[idx][amount] != -1)
+            return dp[idx][amount];
+
+        int count = (int) 1e9;
+
+        // exclude
+        count = Math.min(count, coinChange(coins, amount, idx + 1, dp));
+
+        // include
+        if (amount >= coins[idx])
+            count = Math.min(count, coinChange(coins, amount - coins[idx], idx, dp) + 1);
+
+        return dp[idx][amount] = count;
+
+    }
+
+    public int coinChange(int[] coins, int amount) {
+
+        int n = coins.length;
+        int[][] dp = new int[n + 1][amount + 1];
+
+        for (int i = 0; i <= n; i++)
+            Arrays.fill(dp[i], -1);
+        int res = coinChange(coins, amount, 0, dp);
+        return res == (int) 1e9 ? -1 : res;
+    }
+
+    //518. Coin Change II
+    public int coinChange1(int[] coins, int amount, int idx, int[][] dp) {
+
+        if (amount == 0)
+            return 1;
+
+        if (idx == coins.length) {
+            return amount == 0 ? 1 : 0;
+        }
+
+        if (dp[idx][amount] != -1)
+            return dp[idx][amount];
+
+        int count = 0;
+
+        // exclude
+        count += coinChange1(coins, amount, idx + 1, dp);
+
+        // include
+        if (amount >= coins[idx])
+            count += coinChange1(coins, amount - coins[idx], idx, dp);
+
+        return dp[idx][amount] = count;
+
+    }
+
+    public int change(int amount, int[] coins) {
+        int n = coins.length;
+        int[][] dp = new int[n + 1][amount + 1];
+
+        for (int i = 0; i <= n; i++)
+            Arrays.fill(dp[i], -1);
+        int res = coinChange1(coins, amount, 0, dp);
+        return res;
+    }
+
+    //377. Combination Sum IV
+    public int coinChange3(int[] coins, int amount, int idx, int[][] dp) {
+
+        if (amount == 0)
+            return 1;
+
+        if (idx == coins.length) {
+            return amount == 0 ? 1 : 0;
+        }
+
+        if (dp[idx][amount] != -1)
+            return dp[idx][amount];
+
+        int count = 0;
+
+        // exclude
+        count += coinChange3(coins, amount, idx + 1, dp);
+
+        // include
+        if (amount >= coins[idx])
+            count += coinChange3(coins, amount - coins[idx], 0, dp);
+
+        return dp[idx][amount] = count;
+
+    }
+
+    public int combinationSum4(int[] coins, int amount) {
+        int n = coins.length;
+        int[][] dp = new int[n + 1][amount + 1];
+
+        for (int i = 0; i <= n; i++)
+            Arrays.fill(dp[i], -1);
+        int res = coinChange3(coins, amount, 0, dp);
+        return res;
+    }
+
+    /*
+        public int coinChange(int[] coins, int amount, int[] dp) {
+
+        if (amount == 0)
+            return 1;
+
+        if (dp[amount] != -1)
+            return dp[amount];
+
+        int count = 0;
+
+        for (int i = 0; i < coins.length; i++) {
+            int ele = coins[i];
+
+            if (amount - ele >= 0)
+                count += coinChange(coins, amount - ele, dp);
+        }
+
+        return dp[amount] = count;
+
+    }
+
+    public int combinationSum4(int[] coins, int amount) {
+        int n = coins.length;
+        int[] dp = new int[amount + 1];
+
+        Arrays.fill(dp, -1);
+        int res = coinChange(coins, amount, dp);
+        return res;
+    }
+     */
+
+    //https://www.geeksforgeeks.org/problems/rod-cutting0840/1
+    public int cutRod(int[] price) {
+        // code here
+
+        int n=price.length;
+        int cap=n;
+
+        int [][] dp=new int[n+1][cap+1];
+
+
+        for(int i=0;i<=n;i++)
+        {
+            for(int j=0;j<=cap;j++)
+            {
+                if(i==0 || j==0)
+                {
+                    dp[i][j]=0;
+                    continue;
+                }
+
+
+                dp[i][j]=dp[i-1][j];
+
+                if(j>=i)
+                {
+                    dp[i][j]=Math.max(dp[i][j],dp[i][j-i]+price[i-1]);
+                }
+
+
+            }
+        }
+
+
+        return dp[n][n];
+
+    }
+    //leetcode 1143
+    public int lcs(String text1, String text2, int i, int j, int[][] dp) {
+        if (i == 0 || j == 0)
+            return dp[i][j] = 0;
+
+        if (dp[i][j] != -1)
+            return dp[i][j];
+
+        if (text1.charAt(i - 1) == text2.charAt(j - 1))
+            return dp[i][j] = 1 + lcs(text1, text2, i - 1, j - 1, dp);
+        else
+            return dp[i][j] = Math.max(lcs(text1, text2, i - 1, j, dp), lcs(text1, text2, i, j - 1, dp));
+
+    }
+
+    public int longestCommonSubsequence(String text1, String text2) {
+        int n = text1.length();
+        int m = text2.length();
+
+        int[][] dp = new int[n + 1][m + 1];
+
+        for (int i = 0; i <= n; i++) {
+            Arrays.fill(dp[i], -1);
+        }
+
+        return lcs(text1, text2, n, m, dp);
+
+    }
+
+    //https://www.geeksforgeeks.org/problems/print-all-lcs-sequences3413/1?utm_source=youtube&utm_medium=collab_striver_ytdescription&utm_campaign=print-all-lcs-sequences
+    //gave tle but good
+
+    public List<String> all_longest_common_subsequences(String text1, String text2) {
+        int n = text1.length();
+        int m = text2.length();
+
+        // Step 1: Fill the DP table
+        int[][] dp = new int[n + 1][m + 1];
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= m; j++) {
+                if (text1.charAt(i - 1) == text2.charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1] + 1;
+                } else {
+                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+                }
+            }
+        }
+
+        // Step 2: Backtrack to find all LCS
+        Set<String> resultSet = new HashSet<>();
+        backtrack(text1, text2, n, m, dp, new StringBuilder(), resultSet);
+
+        List<String>ans= new ArrayList<>(resultSet);
+
+        Collections.sort(ans);
+
+        return ans;
+    }
+
+    private void backtrack(String text1, String text2, int i, int j, int[][] dp, StringBuilder current, Set<String> resultSet) {
+        if (i == 0 || j == 0) {
+            resultSet.add(current.reverse().toString());
+            current.reverse(); // Reverse back to maintain original order
+            return;
+        }
+
+        if (text1.charAt(i - 1) == text2.charAt(j - 1)) {
+            current.append(text1.charAt(i - 1));
+            backtrack(text1, text2, i - 1, j - 1, dp, current, resultSet);
+            current.deleteCharAt(current.length() - 1);
+        } else {
+            if (dp[i - 1][j] == dp[i][j]) {
+                backtrack(text1, text2, i - 1, j, dp, current, resultSet);
+            }
+            if (dp[i][j - 1] == dp[i][j]) {
+                backtrack(text1, text2, i, j - 1, dp, current, resultSet);
+            }
+        }
+    }
+
+    //https://www.geeksforgeeks.org/problems/longest-common-substring1452/1
+    int maxSofar=0;
+
+    public int lcs12(String s1, String s2, int i, int j, int [][]dp)
+    {
+        if(i==0 || j==0)
+        {
+            return dp[i][j]=0;
+        }
+
+
+        if(dp[i][j]!=-1)
+            return dp[i][j];
+
+
+
+        int s2_include=lcs12(s1,s2,i-1,j,dp);
+        int s1_include=lcs12(s1,s2,i,j-1,dp);
+        int s1_s2_include=lcs12(s1,s2,i-1,j-1,dp);
+
+        if(s1.charAt(i-1)==s2.charAt(j-1))
+        {
+            maxSofar=Math.max(maxSofar,1+s1_s2_include);
+            return dp[i][j]=1+s1_s2_include;
+        }
+        else
+        {
+            maxSofar=Math.max(maxSofar,Math.max(s2_include,s1_include));
+            return dp[i][j]=0;
+        }
+    }
+    public int longestCommonSubstr(String s1, String s2) {
+        // code here
+        int n=s1.length();
+        int m=s2.length();
+
+        int [][] dp=new int[n+1][m+1];
+
+        for(int i=0;i<=n;i++)
+            Arrays.fill(dp[i],-1);
+
+
+        int ans=lcs12(s1,s2,n,m,dp);
+
+        return maxSofar;
+    }
+
+
+    /*
+        public int longestCommonSubstr(String s1, String s2) {
+        // code here
+         int n=s1.length();
+         int m=s2.length();
+
+          int maxSofar=0;
+         int [][] dp=new int[n+1][m+1];
+
+         for(int i=0;i<=n;i++)
+         {
+             for(int j=0;j<=m;j++)
+             {
+                 if(i==0 ||j==0)
+                 {
+                     dp[i][j]=0;
+                     continue;
+                 }
+
+                 if(s1.charAt(i-1)==s2.charAt(j-1))
+                 {
+                     dp[i][j]=1+dp[i-1][j-1];
+
+                 }
+                 else
+                   dp[i][j]=0;
+
+                   maxSofar=Math.max(maxSofar,dp[i][j]);
+             }
+         }
+
+         return maxSofar;
+    }
+     */
+
+    //leetcode 516
+    public int plaindrome(String s, int i, int j, int[][] dp) {
+
+        if (i >= j) {
+            if (i == j)
+                return dp[i][j] = 1;
+            else
+                return 0;
+        }
+
+        if (dp[i][j] != -1)
+            return dp[i][j];
+
+        if (s.charAt(i) == s.charAt(j)) {
+            return dp[i][j] = 2 + plaindrome(s, i + 1, j - 1, dp);
+        } else {
+            return dp[i][j] = Math.max(plaindrome(s, i + 1, j, dp), plaindrome(s, i, j - 1, dp));
+        }
+    }
+
+    public int longestPalindromeSubseq(String s) {
+
+        int i = 0;
+        int j = s.length() - 1;
+        int[][] dp = new int[j + 1][j + 1];
+
+        for (int k = 0; k <= j; k++)
+            Arrays.fill(dp[k], -1);
+
+        return plaindrome(s, i, j, dp);
+    }
+    //leetcode 583
+    // can we solved using LCS
+// ((n+m) -(2*lcs))
+    public int minDeletion(String word1, String word2, int n, int m, int[][] dp) {
+        if (n == 0 || m == 0) {
+            if (n == 0 && m == 0)
+                return dp[n][m] = 0;
+            else
+                return dp[n][m] = (n >= m ? n : m);
+        }
+
+        if (dp[n][m] != -1)
+            return dp[n][m];
+
+        int word1Included = 1 + minDeletion(word1, word2, n - 1, m, dp);
+        int word2Included = 1 + minDeletion(word1, word2, n, m - 1, dp);
+        int bothInclude = minDeletion(word1, word2, n - 1, m - 1, dp);
+
+        if (word1.charAt(n - 1) == word2.charAt(m - 1)) {
+            return dp[n][m] = bothInclude;
+        } else
+            return dp[n][m] = Math.min(word1Included, word2Included);
+    }
+
+    public int minDistance(String word1, String word2) {
+
+        int n = word1.length();
+        int m = word2.length();
+
+        int[][] dp = new int[n + 1][m + 1];
+
+        for (int i = 0; i <= n; i++)
+            Arrays.fill(dp[i], -1);
+        return minDeletion(word1, word2, n, m, dp);
+    }
+
+    //leetcode 1092
+    public String shortestCommonSupersequence(String str1, String str2) {
+        int n = str1.length();
+
+        int m = str2.length();
+
+        int[][] dp = new int[n + 1][m + 1];
+        // int dp[n+1][m+1];
+        for (int i = 0; i <= n; i++)
+            for (int j = 0; j <= m; j++) {
+                if (i == 0 || j == 0)
+                    dp[i][j] = 0;
+            }
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= m; j++) {
+                if (str1.charAt(i - 1) == str2.charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1] + 1;
+                } else
+                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+
+        StringBuilder s = new StringBuilder();
+
+        int i = n;
+        int j = m;
+        while (i > 0 && j > 0) {
+
+            if (str1.charAt(i - 1) == str2.charAt(j - 1)) {
+                s.append(str1.charAt(i - 1));
+                i--;
+                j--;
+            } else {
+
+                if (dp[i][j - 1] > dp[i - 1][j]) {
+                    s.append(str2.charAt(j - 1));
+                    j--;
+                } else {
+                    s.append(str1.charAt(i - 1));
+                    i--;
+                }
+            }
+        }
+
+        while (i > 0) {
+            s.append(str1.charAt(i - 1));
+            i--;
+        }
+
+        while (j > 0) {
+            s.append(str2.charAt(j - 1));
+            j--;
+        }
+
+        s.reverse();
+        return s.toString();
+
+    }
+
+    //leetcode 115
+    public int distinct(String s, String t, int n, int m, int[][] dp) {
+
+        if (m == 0)
+            return 1;
+
+        if (n < m)
+            return 0;
+
+        if (dp[n][m] != -1)
+            return dp[n][m];
+
+        int z = distinct(s, t, n - 1, m - 1, dp);
+        int a = distinct(s, t, n - 1, m, dp);
+
+        if (s.charAt(n - 1) == t.charAt(m - 1))
+            return dp[n][m] = z + a;
+        else
+            return dp[n][m] = a;
+    }
+
+    public int numDistinct(String word1, String word2) {
+
+        int n = word1.length();
+        int m = word2.length();
+
+        int[][] dp = new int[n + 1][m + 1];
+
+        for (int i = 0; i <= n; i++)
+            Arrays.fill(dp[i], -1);
+
+        return distinct(word1, word2, n, m, dp);
+    }
+
+    //leetcode 72
+    /*
+    public int editDistance(String s, String t, int n, int m, int[][] dp) {
+        if (n == 0 || m == 0) {
+            return dp[n][m] = (n == 0 ? m : n);
+        }
+
+        if (dp[n][m] != -1)
+            return dp[n][m];
+
+        int insert = editDistance(s, t, n, m - 1, dp);
+        int delete = editDistance(s, t, n - 1, m, dp);
+        int replace = editDistance(s, t, n - 1, m - 1, dp);
+
+        if (s.charAt(n - 1) == t.charAt(m - 1)) {
+            return dp[n][m] = replace;
+        } else {
+            return dp[n][m] = 1 + Math.min(insert, Math.min(delete, replace));
+        }
+
+    }
+
+    public int minDistance(String word1, String word2) {
+        int n = word1.length();
+        int m = word2.length();
+
+        int[][] dp = new int[n + 1][m + 1];
+
+        for (int i = 0; i <= n; i++) {
+            Arrays.fill(dp[i], -1);
+        }
+        return editDistance(word1, word2, n, m, dp);
+    }
+    */
+    //leetcode 44
+    // 1->true,-1->not explored, 0->false;
+    public int match(String s, String p, int n, int m, int[][] dp) {
+
+        // base case
+        if (n == 0 || m == 0) {
+            if (n == 0 && m == 0)
+                return 1;
+
+            if (m == 0 && n != 0)
+                return 0;
+
+            if (n == 0 && m > 0) {
+
+                for (int i = 0; i < m; i++) {
+                    if (p.charAt(i) != '*')
+                        return 0;
+                }
+
+                return 1;
+            }
+
+        }
+
+        if (dp[n][m] != -1)
+            return dp[n][m];
+
+        char ch = s.charAt(n - 1);
+        char ch1 = p.charAt(m - 1);
+
+        if (ch == ch1 || ch1 == '?')
+            return dp[n][m] = match(s, p, n - 1, m - 1, dp);
+
+        if (ch1 == '*') {
+            boolean res = false;
+            res = res || (match(s, p, n, m - 1, dp) == 1);// considering * as empty
+            res = res || (match(s, p, n - 1, m, dp) == 1);// considering * as one char
+
+            return dp[n][m] = (res ? 1 : 0);
+        }
+
+        return dp[n][m] = 0;
+    }
+
+    public boolean isMatch(String s, String p) {
+        int n = s.length();
+
+        int m = p.length();
+
+        int[][] dp = new int[n + 1][m + 1];
+
+        for (int i = 0; i <= n; i++) {
+            Arrays.fill(dp[i], -1);
+        }
+
+        return match(s, p, n, m, dp) == 1;
+
     }
 }
 
