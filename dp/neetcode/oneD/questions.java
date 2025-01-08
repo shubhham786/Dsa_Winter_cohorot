@@ -228,4 +228,99 @@ public class questions {
 
         return wordBreak(s, 0, dp);
     }
+
+//leetcode 300
+public int lengthOfLIS(int[] nums) {
+
+    int n = nums.length;
+    int[] dp = new int[n];
+    int len = 1;
+    for (int i = 0; i < nums.length; i++) {
+        dp[i] = 1;
+        for (int j = i - 1; j >= 0; j--) {
+            if (nums[i] > nums[j]) {
+                dp[i] = Math.max(dp[i], dp[j] + 1);
+            }
+
+        }
+
+        len = Math.max(len, dp[i]);
+    }
+
+    return len;
+}
+
+//leetcode 416
+public boolean targetSum(int[] nums, int tar, int idx, Boolean[][] dp) {
+    if (tar == 0)
+        return dp[idx][tar] = true;
+
+    if (idx == nums.length) {
+        dp[idx][tar] = (tar == 0 ? true : false);
+    }
+    if (dp[idx][tar] != null)
+        return dp[idx][tar];
+
+    boolean res = false;
+
+    res = res || targetSum(nums, tar, idx + 1, dp);
+
+    if (tar - nums[idx] >= 0)
+        res = res || targetSum(nums, tar - nums[idx], idx + 1, dp);
+
+    return dp[idx][tar] = res;
+}
+
+    public boolean canPartition(int[] nums) {
+
+        int sum = 0;
+
+        for (int i = 0; i < nums.length; i++) {
+            sum += nums[i];
+        }
+
+        if (sum % 2 != 0)
+            return false;
+
+        int tar = sum / 2;
+        int n = nums.length;
+        Boolean[][] dp = new Boolean[n + 1][tar + 1];
+
+        Boolean res = targetSum(nums, tar, 0, dp);
+        for (int i = 0; i <= n; i++) {
+            for (int j = 0; j <= tar; j++)
+                System.out.print(dp[i][j] + " ");
+
+            System.out.println();
+        }
+
+        return res;
+
+    }
+
+    //leetcode 120
+    public int minimumTotal(List<List<Integer>> triangle) {
+        int n = triangle.size();
+        int m = triangle.get(n - 1).size();
+
+        int[][] dp = new int[n][m];
+        for (int i = 0; i < n; i++) {
+            Arrays.fill(dp[i], -1);
+        }
+
+        for (int i = m - 1; i >= 0; i--) {
+            dp[n - 1][i] = triangle.get(n - 1).get(i);
+        }
+
+        m--;
+        for (int i = n - 2; i >= 0; i--) {
+            for (int j = m - 1; j >= 0; j--) {
+                dp[i][j] = Math.min(dp[i + 1][j], dp[i + 1][j + 1]) + triangle.get(i).get(j);
+            }
+            m--;
+        }
+
+        return dp[0][0];
+    }
+
 }
