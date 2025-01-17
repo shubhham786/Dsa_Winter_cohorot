@@ -969,4 +969,57 @@ public class leetcode {
         // Return actual height
         return Math.max(leftHeight, rightHeight) + 1;
     }
+
+    //https://www.naukri.com/code360/problems/size-of-largest-bst-in-binary-tree_893103?utm_source=striver&utm_medium=website&utm_campaign=a_zcoursetuf&leftPanelTabValue=PROBLEM
+    public static class bstPair{
+
+        boolean isBst=true;
+
+        int min=(int)1e9;
+        int max=-(int)1e9;
+
+        int size=0;
+    }
+
+    public static bstPair largest(TreeNode root)
+    {
+        if(root==null)
+        {
+            bstPair base=new bstPair();
+            return base;
+        }
+
+        bstPair leftPair=largest(root.left);
+        bstPair rightPair=largest(root.right);
+
+        bstPair ans=new bstPair();
+        ans.isBst=false;
+
+        if(leftPair.isBst && rightPair.isBst && leftPair.max<root.val && rightPair.min>root.val)
+        {
+            ans.isBst=true;
+            ans.min=Math.min(leftPair.min,root.val);
+            ans.max=Math.max(rightPair.max, root.val);
+            ans.size=leftPair.size+rightPair.size+1;
+
+        }
+        else
+        {
+            if(leftPair.size>rightPair.size)
+            {
+                ans.size=leftPair.size;
+            }
+            else
+            {
+                ans.size=rightPair.size;
+            }
+        }
+
+        return ans;
+    }
+    public static int largestBST(TreeNode root) {
+        // Write your code here.
+
+        return largest(root).size;
+    }
 }
