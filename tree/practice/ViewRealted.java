@@ -227,4 +227,102 @@ public class ViewRealted {
 
         return camera;
     }
+
+    //leetcode 337
+
+    public int[] rob1(TreeNode root) {
+        if (root == null) {
+            return new int[] { 0, 0 };
+        }
+
+        int[] left = rob1(root.left);
+        int[] right = rob1(root.right);
+
+        int[] ans = new int[2];
+        ans[0] = left[1] + right[1] + root.val;
+        ans[1] = Math.max(left[0], left[1]) + Math.max(right[0], right[1]);
+
+        return ans;
+    }
+
+    public int rob(TreeNode root) {
+        if (root == null)
+            return 0;
+
+        int[] ans = rob1(root);
+
+        return Math.max(ans[0], ans[1]);
+    }
+
+    //leetcode 1372
+    // Global variable to store the maximum zigzag path length
+    int maxAns = 0;
+
+    // Helper function to calculate the longest zigzag path starting from the given node
+// The function returns an array of two integers:
+// arr[0] -> Longest zigzag path starting from the current node and going left
+// arr[1] -> Longest zigzag path starting from the current node and going right
+    public int[] longestZigZag_(TreeNode root) {
+        // Base case: If the current node is null, return {-1, -1}
+        // to indicate no zigzag path exists from this point
+        if (root == null)
+            return new int[] { -1, -1 };
+
+        // Recursively calculate the zigzag path lengths for the left and right subtrees
+        int[] left = longestZigZag_(root.left);
+        int[] right = longestZigZag_(root.right);
+
+        // Initialize an array to store the results for the current node
+        int[] ans = new int[2];
+
+        // Calculate the zigzag path length starting from the current node and going left
+        // This is 1 + the zigzag path length from the left child when moving right
+        ans[0] = 1 + left[1];
+
+        // Calculate the zigzag path length starting from the current node and going right
+        // This is 1 + the zigzag path length from the right child when moving left
+        ans[1] = 1 + right[0];
+
+        // Update the global maximum zigzag path length
+        maxAns = Math.max(maxAns, Math.max(ans[0], ans[1]));
+
+        // Return the results for the current node
+        return ans;
+    }
+
+    // Main function to find the longest zigzag path in a binary tree
+    public int longestZigZag(TreeNode root) {
+        // Edge case: If the tree is empty, return 0
+        if (root == null)
+            return 0;
+
+        // Call the helper function to compute the longest zigzag path
+        longestZigZag_(root);
+
+        // Return the global maximum zigzag path length
+        return maxAns;
+    }
+
+    //leetcode 979
+    int cost = 0;
+
+    public int distributeCoins_(TreeNode root) {
+
+        if (root == null)
+            return 0;
+
+        int left = distributeCoins_(root.left);
+        int right = distributeCoins_(root.right);
+
+        cost += Math.abs(left) + Math.abs(right);
+
+        return left + right + root.val - 1;
+    }
+
+    public int distributeCoins(TreeNode root) {
+
+        int z = distributeCoins_(root);
+
+        return cost;
+    }
 }
