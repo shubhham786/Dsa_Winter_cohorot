@@ -1,4 +1,4 @@
-package tree.practice;
+package tree;
 
 import java.util.*;
 
